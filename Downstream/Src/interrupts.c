@@ -84,9 +84,9 @@ void SysTick_Handler(void)
 
 void SPI1_IRQHandler(void)
 {
-	SPI_INT_ACTIVE_ON;
+	//SPI_INT_ACTIVE_ON;
 	HAL_SPI_IRQHandler(&Hspi1);
-	SPI_INT_ACTIVE_OFF;
+	//SPI_INT_ACTIVE_OFF;
 }
 
 
@@ -95,7 +95,9 @@ void SPI1_IRQHandler(void)
 */
 void OTG_FS_IRQHandler(void)
 {
+  SPI_INT_ACTIVE_ON;
   HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
+  SPI_INT_ACTIVE_OFF;
 }
 
 
