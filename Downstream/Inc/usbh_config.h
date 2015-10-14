@@ -131,7 +131,7 @@
   * @}
   */ 
                                                                 
-    
+#define USB_USE_HS_HARDWARE
     
 /**
   * @}

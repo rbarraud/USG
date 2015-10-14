@@ -145,7 +145,20 @@ void GPIO_Init(void)
 	GPIO_InitStruct.Pin = USB_HS_VBUS_PIN;
 	HAL_GPIO_Init(USB_HS_VBUS_PORT, &GPIO_InitStruct);
 
-	//Enable USB_FS power
+	//Enable USB power
+#ifdef  USB_USE_HS_HARDWARE
+	USB_HS_VBUSON_PORT->BSRR = (USB_HS_VBUSON_PIN << BSRR_SHIFT_HIGH);
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pin = USB_HS_VBUSON_PIN;
+	HAL_GPIO_Init(USB_HS_VBUSON_PORT, &GPIO_InitStruct);
+
+	//Disable USB_FS power
+	USB_FS_VBUSON_PORT->BSRR = (USB_FS_VBUSON_PIN << BSRR_SHIFT_LOW);
+	GPIO_InitStruct.Pin = USB_FS_VBUSON_PIN;
+	HAL_GPIO_Init(USB_FS_VBUSON_PORT, &GPIO_InitStruct);
+
+#else
 	USB_FS_VBUSON_PORT->BSRR = (USB_FS_VBUSON_PIN << BSRR_SHIFT_HIGH);
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -156,6 +169,7 @@ void GPIO_Init(void)
 	USB_HS_VBUSON_PORT->BSRR = (USB_HS_VBUSON_PIN << BSRR_SHIFT_LOW);
 	GPIO_InitStruct.Pin = USB_HS_VBUSON_PIN;
 	HAL_GPIO_Init(USB_HS_VBUSON_PORT, &GPIO_InitStruct);
+#endif
 
 	//STAT_LED is output
 	STAT_LED_OFF;

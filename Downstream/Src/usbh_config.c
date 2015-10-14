@@ -50,8 +50,23 @@ void HAL_HCD_MspInit(HCD_HandleTypeDef* hhcd)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
 
-  if(hhcd->Instance==USB_OTG_FS)
-  {
+#ifdef USB_USE_HS_HARDWARE
+
+  GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF12_OTG_HS_FS;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  __USB_OTG_HS_CLK_ENABLE();
+
+  HAL_NVIC_SetPriority(OTG_HS_IRQn, INT_PRIORITY_USB, 0);
+  HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+
+#else
+//  if(hhcd->Instance==USB_OTG_FS)
+//  {
     /**USB_OTG_FS GPIO Configuration    
     PA11     ------> USB_OTG_FS_DM
     PA12     ------> USB_OTG_FS_DP 
@@ -67,16 +82,23 @@ void HAL_HCD_MspInit(HCD_HandleTypeDef* hhcd)
     __USB_OTG_FS_CLK_ENABLE();
 
     /* Peripheral interrupt init*/
-    HAL_NVIC_SetPriority(OTG_FS_IRQn, INT_PRIORITY_OTG_FS, 0);
+    HAL_NVIC_SetPriority(OTG_FS_IRQn, INT_PRIORITY_USB, 0);
     HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
-  }
+//  }
+#endif
 }
 
 
 void HAL_HCD_MspDeInit(HCD_HandleTypeDef* hhcd)
 {
-  if(hhcd->Instance==USB_OTG_FS)
-  {
+#ifdef USB_USE_HS_HARDWARE
+
+	__USB_OTG_HS_CLK_DISABLE();
+	HAL_NVIC_DisableIRQ(OTG_HS_IRQn);
+
+#else
+//  if(hhcd->Instance==USB_OTG_FS)
+//  {
     /* Peripheral clock disable */
     __USB_OTG_FS_CLK_DISABLE();
   
@@ -89,7 +111,8 @@ void HAL_HCD_MspDeInit(HCD_HandleTypeDef* hhcd)
 
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(OTG_FS_IRQn);
-  }
+//  }
+#endif
 }
 
 /**
@@ -145,22 +168,34 @@ void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum,
   */
 USBH_StatusTypeDef  USBH_LL_Init (USBH_HandleTypeDef *phost)
 {
-  /* Init USB_IP */
-  if (phost->id == HOST_FS) {
-  /* Link The driver to the stack */
-  hhcd_USB_OTG_FS.pData = phost;
-  phost->pData = &hhcd_USB_OTG_FS;
+	/* Link The driver to the stack */
+	hhcd_USB_OTG_FS.pData = phost;
+	phost->pData = &hhcd_USB_OTG_FS;
 
+#ifdef USB_USE_HS_HARDWARE
+
+	hhcd_USB_OTG_FS.Instance = USB_OTG_HS;
+	hhcd_USB_OTG_FS.Init.Host_channels = 8;			//HS host supports 12 if we want...
+	hhcd_USB_OTG_FS.Init.speed = HCD_SPEED_FULL;
+	hhcd_USB_OTG_FS.Init.dma_enable = DISABLE;
+	hhcd_USB_OTG_FS.Init.phy_itface = HCD_PHY_EMBEDDED;
+	hhcd_USB_OTG_FS.Init.Sof_enable = DISABLE;
+
+#else
+
+  /* Init USB_IP */
+//  if (phost->id == HOST_FS) {
   hhcd_USB_OTG_FS.Instance = USB_OTG_FS;
   hhcd_USB_OTG_FS.Init.Host_channels = 8;
   hhcd_USB_OTG_FS.Init.speed = HCD_SPEED_FULL;
   hhcd_USB_OTG_FS.Init.dma_enable = DISABLE;
   hhcd_USB_OTG_FS.Init.phy_itface = HCD_PHY_EMBEDDED;
   hhcd_USB_OTG_FS.Init.Sof_enable = DISABLE;
-  HAL_HCD_Init(&hhcd_USB_OTG_FS);
+//  }
+#endif
 
+  HAL_HCD_Init(&hhcd_USB_OTG_FS);
   USBH_LL_SetTimer (phost, HAL_HCD_GetCurrentFrame(&hhcd_USB_OTG_FS));
-  }
   return USBH_OK;
 }
 

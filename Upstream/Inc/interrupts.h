@@ -52,8 +52,8 @@
 
 #define INT_PRIORITY_SYSTICK	2
 #define INT_PRIORITY_SPI		8			//SPI is more important than USB now!
-#define INT_PRIORITY_OTG_FS		10
-#define INT_PRIORITY_EXT3I		INT_PRIORITY_OTG_FS
+#define INT_PRIORITY_USB		10
+#define INT_PRIORITY_EXT3I		INT_PRIORITY_USB
 
 
 /* Exported macro ------------------------------------------------------------*/

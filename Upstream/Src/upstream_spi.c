@@ -236,7 +236,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 
 	//Elevate priority here to stop EXT3I sneaking in
 	//before we have a chance to process UpstreamInterfaceState change.
-	__set_BASEPRI(INT_PRIORITY_OTG_FS << (8 - __NVIC_PRIO_BITS));
+	__set_BASEPRI(INT_PRIORITY_USB << (8 - __NVIC_PRIO_BITS));
 }
 
 

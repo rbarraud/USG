@@ -39,6 +39,7 @@
 #include "interrupts.h"
 #include "led.h"
 #include "board_config.h"
+#include "usbh_config.h"
 
 
 /* External variables --------------------------------------------------------*/
@@ -77,10 +78,18 @@ void SPI1_IRQHandler(void)
 }
 
 
+#ifdef USB_USE_HS_HARDWARE
+
+void OTG_HS_IRQHandler(void)
+{
+  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
+}
+#else
+
 void OTG_FS_IRQHandler(void)
 {
   HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
 }
-
+#endif
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

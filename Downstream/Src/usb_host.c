@@ -38,6 +38,7 @@
 #include "usb_host.h"
 #include "usbh_core.h"
 #include "usbh_msc.h"
+#include "usbh_config.h"
 #include "downstream_statemachine.h"
 
 /* USB Host Core handle declaration */
@@ -48,7 +49,11 @@ USBH_HandleTypeDef hUsbHostFS;
 void USB_Host_Init(void)
 {
   /* Init Host Library,Add Supported Class and Start the library*/
-  USBH_Init(&hUsbHostFS, Downstream_HostUserCallback, HOST_FS);
+#ifdef USB_USE_HS_HARDWARE
+	USBH_Init(&hUsbHostFS, Downstream_HostUserCallback, HOST_HS);
+#else
+	USBH_Init(&hUsbHostFS, Downstream_HostUserCallback, HOST_FS);
+#endif
 
   USBH_RegisterClass(&hUsbHostFS, USBH_MSC_CLASS);
 
