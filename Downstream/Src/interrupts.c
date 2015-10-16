@@ -44,10 +44,10 @@
 
 /* External variables --------------------------------------------------------*/
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
-extern SPI_HandleTypeDef Hspi1;
+//extern SPI_HandleTypeDef Hspi1;
 
-//extern DMA_HandleTypeDef hdma_spi1_rx;
-//extern DMA_HandleTypeDef hdma_spi1_tx;
+extern DMA_HandleTypeDef hdma_spi1_rx;
+extern DMA_HandleTypeDef hdma_spi1_tx;
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
@@ -70,13 +70,26 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 
-void SPI1_IRQHandler(void)
+//void SPI1_IRQHandler(void)
+//{
+//	SPI_INT_ACTIVE_ON;
+//	HAL_SPI_IRQHandler(&Hspi1);
+//	SPI_INT_ACTIVE_OFF;
+//}
+
+void DMA2_Stream2_IRQHandler(void)
 {
-	SPI_INT_ACTIVE_ON;
-	HAL_SPI_IRQHandler(&Hspi1);
-	SPI_INT_ACTIVE_OFF;
+  SPI_INT_ACTIVE_ON;
+  HAL_DMA_IRQHandler(&hdma_spi1_rx);
+  SPI_INT_ACTIVE_OFF;
 }
 
+void DMA2_Stream3_IRQHandler(void)
+{
+  SPI_INT_ACTIVE_ON;
+  HAL_DMA_IRQHandler(&hdma_spi1_tx);
+  SPI_INT_ACTIVE_OFF;
+}
 
 #ifdef USB_USE_HS_HARDWARE
 
